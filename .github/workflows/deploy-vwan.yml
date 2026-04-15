@@ -40,6 +40,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set deployment timestamp
+        run: echo "DEPLOY_TIMESTAMP=$(date -u +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -50,7 +53,7 @@ jobs:
       - name: WhatIf - vWAN Deployment
         uses: azure/bicep-deploy@v2
         with:
-          name: vwan-whatif
+          name: vwan-whatif-${{ env.DEPLOY_TIMESTAMP }}
           type: deployment
           operation: whatIf
           scope: subscription
@@ -69,6 +72,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set deployment timestamp
+        run: echo "DEPLOY_TIMESTAMP=$(date -u +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -79,7 +85,7 @@ jobs:
       - name: Deploy vWAN
         uses: azure/bicep-deploy@v2
         with:
-          name: vwan-deployment
+          name: vwan-deployment-${{ env.DEPLOY_TIMESTAMP }}
           type: deployment
           operation: create
           scope: subscription
