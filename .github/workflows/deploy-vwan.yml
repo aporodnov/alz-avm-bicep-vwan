@@ -1,0 +1,89 @@
+name: Deploy - vWAN Network
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        type: choice
+        description: Target vWAN profile (selects bicepparam file and subscription)
+        required: true
+        default: Hybrid
+        options:
+          - Hybrid
+          - Cloud
+      mode:
+        type: choice
+        description: Run a WhatIf preview or deploy for real
+        required: true
+        default: WhatIf
+        options:
+          - WhatIf
+          - Deploy
+
+env:
+  PARAMETERS_FILE: ${{ inputs.profile == 'Hybrid' && 'config/hybrid.vwan.bicepparam' || 'config/cloud.vwan.bicepparam' }}
+  SUBSCRIPTION_ID: ${{ inputs.profile == 'Hybrid' && vars.HYBRID_AZURE_SUBSCRIPTION_ID || vars.CLOUD_AZURE_SUBSCRIPTION_ID }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  whatif:
+    name: WhatIf Preview
+    runs-on: ubuntu-latest
+    if: inputs.mode == 'WhatIf'
+    environment: ${{ github.ref == 'refs/heads/main' && 'Prod' || 'Lab' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.VWAN_SPN_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.SUBSCRIPTION_ID }}
+
+      - name: WhatIf - vWAN Deployment
+        uses: azure/bicep-deploy@v2
+        with:
+          name: vwan-whatif
+          type: deployment
+          operation: whatIf
+          scope: subscription
+          subscription-id: ${{ env.SUBSCRIPTION_ID }}
+          location: canadacentral
+          template-file: modules/vwan.bicep
+          parameters-file: ${{ env.PARAMETERS_FILE }}
+
+  deploy:
+    name: Deploy vWAN
+    runs-on: ubuntu-latest
+    if: inputs.mode == 'Deploy'
+    environment: ${{ github.ref == 'refs/heads/main' && 'Prod' || 'Lab' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.VWAN_SPN_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.SUBSCRIPTION_ID }}
+
+      - name: Deploy vWAN
+        uses: azure/bicep-deploy@v2
+        with:
+          name: vwan-deployment
+          type: deployment
+          operation: create
+          scope: subscription
+          subscription-id: ${{ env.SUBSCRIPTION_ID }}
+          location: canadacentral
+          template-file: modules/vwan.bicep
+          parameters-file: ${{ env.PARAMETERS_FILE }}
