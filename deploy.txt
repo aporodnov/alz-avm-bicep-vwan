@@ -1,6 +1,0 @@
-# Samples for testing before CI/CD
-
-New-AzSubscriptionDeployment -Location canadacentral -TemplateFile modules/vwan.bicep -TemplateParameterFile vwan.bicepparam -WhatIf -WhatIfResultFormat FullResourcePayloads
-
-# Deploy
-New-AzSubscriptionDeployment -Location canadacentral -TemplateFile modules/vwan.bicep -TemplateParameterFile vwan.bicepparam
