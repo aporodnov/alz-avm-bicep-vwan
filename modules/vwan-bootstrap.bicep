@@ -16,6 +16,7 @@ module hubUpdate 'br/public:avm/res/network/virtual-hub:0.4.3' = [
       addressPrefix: config.hubAddressPrefix
       virtualWanResourceId: vwan.id
       hubRoutingPreference: config.?hubRoutingPreference
+      tags: config.?tags
       // null leaves router scale at platform default
       virtualRouterAutoScaleConfiguration: config.?routerScaleUnits != null ? {
         minCount: config.routerScaleUnits

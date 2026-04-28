@@ -30,6 +30,7 @@ param virtualHubParameters = [
     hubLocation: vHUB_CC.location
     hubAddressPrefix: vHUB_CC.addressPrefix
     hubRoutingPreference: vHUB_CC.routingPreference
+    tags: vTags
     expressRouteParameters: {
       expressRouteGatewayName: 'vHUB-CC-Hybrid-Fortinet-ERGW'
       deployExpressRouteGateway: true
@@ -61,6 +62,7 @@ param hubBootstrapConfigs = [
     hubLocation: vHUB_CC.location
     hubAddressPrefix: vHUB_CC.addressPrefix
     hubRoutingPreference: vHUB_CC.routingPreference
+    tags: vTags
 
     // Min hub router instances — null = platform default.
     routerScaleUnits: 3
